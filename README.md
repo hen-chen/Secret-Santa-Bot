@@ -16,5 +16,6 @@ Figure out how to host on the cloud
 ## Fluff
 
     If you have a question for your person, DM the bot and it will DM the person with the question (i.e.if person A has person B for secret santa, person A can DM the bot and the bot will ask something to person B)
+    Gift find command that fetches a random Amazon product that costs less than $15
     Countdown before time to enter expires
     Pictures
