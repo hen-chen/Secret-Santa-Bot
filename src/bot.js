@@ -8,8 +8,10 @@ let encouragements = ["Cheer Up, Henry!", "Hang in there, Henry.", "Hey there, H
 let participants = [];
 let hosting = false;
 let host = null;
+let start = false;
 let givingDict = {};
 let receivingDict = {};
+let dueDate = null;
 
 //Help command
 client.on("message", msg => {
@@ -21,16 +23,17 @@ client.on("message", msg => {
         "\n `!enter` Enters you into the Secret Santa" +
         "\n `!leave` Lets you leave the Secret Santa" + 
         "\n `!list` Lets you see everyone in the Secret Santa" +
-        "\n `!start` Starts the Secret Santa. Entering and leaving will no longer be available. Only available to the host." + 
-        "\n `!ask` DM me a question, and I will pass it on to your gift recipient");
+        "\n `!countdown` Lets you see how much time is left before Secret Santa ends" +
+        "\n `!start` Give me a date, and I'll assign everyoen their Secret Santa and set a countdown before the event ends. Entering and leaving will no longer be available. Only available to the host" + 
+        "\n `!ask` DM me a question, and I will pass it on to your gift recipient" +
+        "\n `!reply` DM me something, and I will pass it on to your Secret Santa. You can answer a question they ask, or reuqest something of your own");
     }
 })
 
 //Hosting command
 client.on("message", msg => {
-    if (msg.author.bot) return;
-    if(msg.channel.type === "dm") return;
-    if (msg.content === "!host" && !hosting) {
+    if (msg.author.bot || msg.channel.type === "dm") return;
+    if (msg.content ==="!host" && !hosting && !start) {
         hosting = true;
         host = msg.author;
         msg.channel.send(`Hosting has started! The host is ${host.username}.`);
@@ -43,7 +46,7 @@ client.on("message", msg => {
 // Cancel hosting command
 client.on("message", msg => {
     if (msg.author.bot) return;
-    if(msg.channel.type === "dm") return;
+    if (msg.channel.type === "dm") return;
     if (msg.content === "!cancel" && hosting && JSON.stringify(msg.author) === JSON.stringify(host)) {
         resetSanta();
         msg.channel.send("Hosting has been cancelled.");
@@ -51,6 +54,20 @@ client.on("message", msg => {
         msg.reply("There is no Secret Santa right now.");
     } else if (msg.content === '!cancel' && JSON.stringify(msg.author) !== JSON.stringify(host)) {
         msg.reply(`you are not the host of this Secret Santa! Please ask ${host.username} to cancel.`);
+    }
+})
+
+// Reset command
+client.on("message", msg => {
+    if (msg.author.bot) return;
+    if (msg.channel.type === "dm") return;
+    if (msg.content === "!reset" && start && JSON.stringify(msg.author) === JSON.stringify(host)) {
+        resetSanta();
+        msg.channel.send("Hosting has been cancelled.");
+    } else if (msg.content === "!reset" && !start) {
+        msg.reply("Secret Santa hasn't started yet.");
+    } else if (msg.content === '!reset' && JSON.stringify(msg.author) !== JSON.stringify(host)) {
+        msg.reply(`you are not the host of this Secret Santa! Please ask ${host.username} to reset.`);
     }
 })
 
@@ -80,7 +97,7 @@ client.on("message", msg => {
         //console.log(participants);
         msg.channel.send(`Goodbye ${msg.author.username}. See you next time!`);
     }
-    else if(msg.content === "!leave" && hosting) {
+    else if (msg.content === "!leave" && hosting) {
         msg.reply("you're not signed up yet.");
     }
     else if (msg.content === "!leave" && !hosting) {
@@ -110,8 +127,16 @@ client.on("message", msg => {
     if (msg.content === "!start" && hosting && JSON.stringify(msg.author) !== JSON.stringify(host)) {
         msg.reply(`you are not the host of this Secret Santa! Please ask ${host.username} to start.`);
     }
-    else if (msg.content === "!start" && hosting) {
-    //else if (msg.content === "!start" && hosting && participants.length >= 3) {
+    else if (msg.content.includes("!start") && hosting && participants.length >= 3) {
+        dueDate = new Date(msg.content.substr(6));
+        if (isNaN(dueDate.getTime())) {
+            msg.channel.send("This end date is invalid!");
+            dueDate = null;
+            return;
+        }
+        let diff = milliToDays(); // testing to calc diff
+        console.log(diff);
+
         participants = getSantas(participants);
         for (let i = 0; i < participants.length; i++) {
             if (i === participants.length - 1) {
@@ -124,8 +149,7 @@ client.on("message", msg => {
                 participants[i].send(`${participants[i + 1].username} is your secret santa`);
             }
         }
-        //Ends hosting
-        participants = [];
+        start = true;
         hosting = false;
         msg.channel.send("Secret Santa has begun!");
     } else if (msg.content === "!start" && !hosting) {
@@ -159,19 +183,11 @@ client.on("message", msg => {
         let message = `${msg.author.username} says: ` + msg.content.substr(7);
 
         //Find the secret santa
-
-        // let secretSantaGiver = null;
-        // console.log(givingDict);
-        // for (const [key, value] of Object.entries(givingDict)) {
-        //     //console.log(key, value);
-        //     if (givingDict[key] === msg.author) console.log(key);
-        // }
         let secretSantaGiver = receivingDict[msg.author];
         if (secretSantaGiver === null) {
             console.log('Null value in dictionary');
             return;
         }
-        console.log(secretSantaGiver, message);
         secretSantaGiver.send(message);
         msg.author.send("Your message has been sent!");
     } else if (msg.content.includes('!reply') && !givingDict.hasOwnProperty(msg.author)) {
@@ -179,10 +195,20 @@ client.on("message", msg => {
     }
 })
 
+// Countdown
+client.on("message", msg => {
+    if (msg.author.bot) return;
+    if (start && msg.content === "!countdown") {
+        msg.channel.send(milliToDays() + " days remaining!");
+    } else if (msg.content === "!countdown" && !start) {
+        msg.channel.send("Secret Santa has not started yet");
+    }
+})
+
 // Find a gift
 client.on("message", msg => {
     if (msg.author.bot) return;
-    if(msg.channel.type === "text") return;
+    if (msg.channel.type === "text") return;
     if (msg.content.includes("!gift") && givingDict.hasOwnProperty(msg.author)) {
         let message = findGift();
         msg.author.send(message);
@@ -213,6 +239,14 @@ const resetSanta = () => {
     hosting = false;
     host = null;
     givingDict = {};
+    receivingDict = {};
+    dueDate = null;
+    start = false;
+}
+
+const milliToDays = () => {
+    let currDate = new Date();
+    return Math.floor((dueDate - currDate) / 86400000);
 }
 
 const findGift = () => {
