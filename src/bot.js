@@ -8,7 +8,8 @@ let encouragements = ["Cheer Up, Henry!", "Hang in there, Henry.", "Hey there, H
 let participants = [];
 let hosting = false;
 let host = null;
-let pairings = {};
+let givingDict = {};
+let receivingDict = {};
 
 //Help command
 client.on("message", msg => {
@@ -59,7 +60,7 @@ client.on("message", msg => {
 
     if (msg.content === "!enter" && hosting && !participants.includes(msg.author)) {
         participants.push(msg.author);
-        console.log(participants);
+        //console.log(participants);
         msg.channel.send(`Welcome ${msg.author.username}! You are in for this Secret Santa!`);
     }
     else if (msg.content === "!enter" && hosting) {
@@ -76,7 +77,7 @@ client.on("message", msg => {
 
     if (msg.content === "!leave" && hosting && participants.includes(msg.author)) {
         participants.splice(participants.indexOf(msg.author), 1);
-        console.log(participants);
+        //console.log(participants);
         msg.channel.send(`Goodbye ${msg.author.username}. See you next time!`);
     }
     else if(msg.content === "!leave" && hosting) {
@@ -105,20 +106,21 @@ client.on("message", msg => {
 
 // Start command
 client.on("message", msg => {
-    if (msg.author.bot) return;
-    if(msg.channel.type === "dm") return;
+    if (msg.author.bot || msg.channel.type === "dm") return;
     if (msg.content === "!start" && hosting && JSON.stringify(msg.author) !== JSON.stringify(host)) {
         msg.reply(`you are not the host of this Secret Santa! Please ask ${host.username} to start.`);
     }
-    else if (msg.content === "!start" && hosting && participants.length >= 3) {
+    else if (msg.content === "!start" && hosting) {
+    //else if (msg.content === "!start" && hosting && participants.length >= 3) {
         participants = getSantas(participants);
-        console.log(participants);
         for (let i = 0; i < participants.length; i++) {
             if (i === participants.length - 1) {
-                pairings[participants[i]] = participants[0];
+                givingDict[participants[i]] = participants[0];
+                receivingDict[participants[0]] = participants[i];
                 participants[i].send(`${participants[0].username} is your secret santa`);
             } else {
-                pairings[participants[i]] = participants[i + 1];
+                givingDict[participants[i]] = participants[i + 1];
+                receivingDict[participants[i + 1]] = participants[i];
                 participants[i].send(`${participants[i + 1].username} is your secret santa`);
             }
         }
@@ -135,17 +137,56 @@ client.on("message", msg => {
 
 // Relay a message
 client.on("message", msg => {
-    if (msg.author.bot) return;
-    if(msg.channel.type === "text") return;
-    if (msg.content.includes("!ask") && pairings.hasOwnProperty(msg.author)) {
+    if (msg.author.bot || msg.channel.type === "text") return;
+    if (msg.content.includes("!ask") && givingDict.hasOwnProperty(msg.author)) {
         //Parses question
-        let message = "Your secret Santa has asked: " + msg.content.substr(5);
+        let message = "Your secret Santa has asked: " + msg.content.substr(5); // !ask is index 5
 
         //Find the secret santa
-        let secretSanta = pairings[msg.author];
+        let secretSanta = givingDict[msg.author];
         secretSanta.send(message);
         msg.author.send("Your question has been asked!");
-    } else if (msg.content.includes('!ask') && !pairings.hasOwnProperty(msg.author)) {
+    } else if (msg.content.includes('!ask') && !givingDict.hasOwnProperty(msg.author)) {
+        msg.author.send('Either you are not in the Secret Santa or the event has not yet begun. Ask your host for more details.');
+    }
+})
+
+// Respond to a question
+client.on("message", msg => {
+    if (msg.author.bot || msg.channel.type === "text") return;
+    if (msg.content.includes("!reply") && givingDict.hasOwnProperty(msg.author)) {
+        //Parses question
+        let message = `${msg.author.username} says: ` + msg.content.substr(7);
+
+        //Find the secret santa
+
+        // let secretSantaGiver = null;
+        // console.log(givingDict);
+        // for (const [key, value] of Object.entries(givingDict)) {
+        //     //console.log(key, value);
+        //     if (givingDict[key] === msg.author) console.log(key);
+        // }
+        let secretSantaGiver = receivingDict[msg.author];
+        if (secretSantaGiver === null) {
+            console.log('Null value in dictionary');
+            return;
+        }
+        console.log(secretSantaGiver, message);
+        secretSantaGiver.send(message);
+        msg.author.send("Your message has been sent!");
+    } else if (msg.content.includes('!reply') && !givingDict.hasOwnProperty(msg.author)) {
+        msg.author.send('Either you are not in the Secret Santa or the event has not yet begun. Ask your host for more details.');
+    }
+})
+
+// Find a gift
+client.on("message", msg => {
+    if (msg.author.bot) return;
+    if(msg.channel.type === "text") return;
+    if (msg.content.includes("!gift") && givingDict.hasOwnProperty(msg.author)) {
+        let message = findGift();
+        msg.author.send(message);
+    } else if (msg.content.includes('!gift') && !givingDict.hasOwnProperty(msg.author)) {
         msg.author.send('Either you are not in the Secret Santa or the event has not yet begun. Ask your host for more details.');
     }
 })
@@ -171,7 +212,11 @@ const resetSanta = () => {
     participants = [];
     hosting = false;
     host = null;
-    pairings = {};
+    givingDict = {};
+}
+
+const findGift = () => {
+    return "https://www.amazon.com";
 }
 
 //Previous functions
