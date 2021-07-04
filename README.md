@@ -1,6 +1,6 @@
 # discord_bot
 
-TODO
+TODO LIST
 
 ## Priority
 Read through docs and watch some tutorials on JS and jsons. APIS
