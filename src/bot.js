@@ -132,9 +132,9 @@ client.on("message", msg => {
     }
 
     // Start command
-    if (msg.content === "!start" && hosting && JSON.stringify(msg.author) !== JSON.stringify(host)) {
+    if (msg.content.substr(0, 6) === "!start" && hosting && JSON.stringify(msg.author) !== JSON.stringify(host)) {
         msg.reply(`you are not the host of this Secret Santa! Please ask ${host.username} to start.`);
-    } else if (msg.content.includes("!start") && hosting && participants.length >= 3) {
+    } else if (msg.content.substr(0, 6) === "!start" && hosting && participants.length >= 3) {
         dueDate = new Date(msg.content.substr(6));
         if (isNaN(dueDate.getTime())) {
             msg.channel.send("This end date is invalid!");
@@ -171,9 +171,9 @@ client.on("message", msg => {
         start = true;
         hosting = false;
         msg.channel.send("Secret Santa has begun!");
-    } else if (msg.content.includes("!start") && !hosting) {
+    } else if (msg.content.substr(0, 6) === "!start" && !hosting) {
         msg.reply("you need to host before you can start. Try `!host`.");
-    } else if (msg.content.includes('!start') && participants.length < 3) {
+    } else if (msg.content.substr(0, 6) === "!start" && participants.length < 3) {
         msg.channel.send('Not enough participants. Need at least 3.');
     }
 })
@@ -183,20 +183,20 @@ client.on("message", msg => {
     if (msg.author.bot || msg.channel.type === "text") return;
 
     // Relay a message
-    if (msg.content.includes("!ask") && givingDict.hasOwnProperty(msg.author)) {
+    if (msg.content.substr(0, 4) === "!ask" && givingDict.hasOwnProperty(msg.author)) {
         //Parses question
-        let message = "Your secret Santa has asked: " + msg.content.substr(4).trim(); // !ask is index 4
+        let message = "Your secret Santa has asked: " + msg.content.substr(4).trim(); // !ask is index 5
 
         //Find the secret santa
         let secretSanta = givingDict[msg.author];
         secretSanta.send(message);
         msg.author.send("Your question has been asked!");
-    } else if (msg.content.includes('!ask') && !givingDict.hasOwnProperty(msg.author)) {
+    } else if (msg.content.substr(0, 4) === "!ask" && !givingDict.hasOwnProperty(msg.author)) {
         msg.author.send('Either you are not in the Secret Santa or the event has not yet begun. Ask your host for more details.');
     }
 
     // Respond to a question
-    if (msg.content.includes("!reply") && givingDict.hasOwnProperty(msg.author)) {
+    if (msg.content.substr(0, 6) === "!reply" && givingDict.hasOwnProperty(msg.author)) {
         //Parses question
         let message = `${msg.author.username} says: ` + msg.content.substr(6).trim();
 
@@ -208,7 +208,7 @@ client.on("message", msg => {
         }
         secretSantaGiver.send(message);
         msg.author.send("Your message has been sent!");
-    } else if (msg.content.includes('!reply') && !givingDict.hasOwnProperty(msg.author)) {
+    } else if (msg.content.substr(0, 6) === "!reply" && !givingDict.hasOwnProperty(msg.author)) {
         msg.author.send('Either you are not in the Secret Santa or the event has not yet begun. Ask your host for more details.');
     }
 })
