@@ -10,7 +10,7 @@ This discord bot allows users to host their own Secret Santa gift exchange. Just
 
 To add the bot to your server, just follow the link below. Select the server you want from the dropdown, and enjoy!
 
-[Invite link](https://discord.com/api/oauth2/authorize?client_id=859129156503339008&permissions=129088&scope=bot)
+[Invite Link](https://discord.com/api/oauth2/authorize?client_id=859129156503339008&permissions=129088&scope=bot)
 
 ## Installation
 
