@@ -185,7 +185,7 @@ client.on("message", msg => {
     // Relay a message
     if (msg.content.includes("!ask") && givingDict.hasOwnProperty(msg.author)) {
         //Parses question
-        let message = "Your secret Santa has asked: " + msg.content.substr(5); // !ask is index 5
+        let message = "Your secret Santa has asked: " + msg.content.substr(4).trim(); // !ask is index 4
 
         //Find the secret santa
         let secretSanta = givingDict[msg.author];
@@ -198,7 +198,7 @@ client.on("message", msg => {
     // Respond to a question
     if (msg.content.includes("!reply") && givingDict.hasOwnProperty(msg.author)) {
         //Parses question
-        let message = `${msg.author.username} says: ` + msg.content.substr(7);
+        let message = `${msg.author.username} says: ` + msg.content.substr(6).trim();
 
         //Find the secret santa
         let secretSantaGiver = receivingDict[msg.author];
