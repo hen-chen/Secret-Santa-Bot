@@ -121,7 +121,7 @@ client.on("message", msg => {
         msg.channel.send("Hosting has been cancelled.");
         return;
     } else if (msg.content === "!reset" && !start) {
-        msg.reply("Secret Santa hasn't started yet.");
+        msg.reply("You need to start the event before you can reset. Try `!cancel` instead.");
         return;
     } else if (msg.content === '!reset' && JSON.stringify(msg.author) !== JSON.stringify(host)) {
         msg.reply(`you are not the host of this Secret Santa! Please ask ${host.username} to reset.`);
