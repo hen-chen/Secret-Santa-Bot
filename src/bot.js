@@ -1,10 +1,8 @@
 require('dotenv').config();
-const fetch = require("node-fetch");
 const Discord = require("discord.js");
 
 const client = new Discord.Client();
-let sadWords = ["sad", "mad", "bad"];
-let encouragements = ["Cheer Up, Henry!", "Hang in there, Henry.", "Hey there, Henry!"];
+
 let participants = [];
 let hosting = false;
 let host = null;
@@ -29,42 +27,54 @@ client.on("message", msg => {
         "\n `!start` Give me a date, and I'll assign everyoen their Secret Santa and set a countdown before the event ends. Entering and leaving will no longer be available. Only available to the host" +
         "\n `!ask` DM me a question, and I will pass it on to your gift recipient" +
         "\n `!reply` DM me something, and I will pass it on to your Secret Santa. You can answer a question they ask, or reuqest something of your own");
+        return;
     }
 
     // Enter command
     if (msg.content === "!enter" && hosting && !participants.includes(msg.author)) {
         participants.push(msg.author);
         msg.channel.send(`Welcome ${msg.author.username}! You are in for this Secret Santa!`);
+        return;
     } else if (msg.content === "!enter" && hosting) {
         msg.reply("you're already signed up.");
+        return;
     } else if (msg.content === "!enter" && !hosting && !start) {
         msg.reply("Sorry! There isn't a Secret Santa right now.");
+        return;
     } else if (msg.content === "!enter" && !hosting && start) {
         msg.reply(`Sorry, Secret Santa has alreay begun. Please ask ${host.username} about restarting if you want to withdraw.`);
+        return;
     }
 
     // Leave command
     if (msg.content === "!leave" && hosting && participants.includes(msg.author)) {
         participants.splice(participants.indexOf(msg.author), 1);
         msg.channel.send(`Goodbye ${msg.author.username}. See you next time!`);
+        return;
     } else if (msg.content === "!leave" && hosting) {
         msg.reply("you're not signed up yet.");
+        return;
     } else if (msg.content === "!leave" && !hosting && !start) {
         msg.reply("Sorry! There isn't a Secret Santa right now.");
+        return;
     } else if (msg.content === "!enter" && !hosting && start) {
         msg.reply(`Sorry, Secret Santa has alreay begun. Please ask ${host.username} about restarting if you want to join.`);
+        return;
     }
 
     // List all members of Secret Santa
     if (msg.content === "!list" && hosting && participants.length === 0) {
         msg.channel.send("There are no participants as of now.");
+        return;
     } else if (msg.content === "!list" && hosting) {
         let message = "The current participants are:";
         participants.forEach(x => message += "\n" + x.username);
         message += "\nThe host is " + host.username;
         msg.channel.send(message);
+        return;
     } else if (msg.content === "!list") {
         msg.channel.send("No host has started yet.");
+        return;
     }
 
     // Countdown
@@ -86,36 +96,42 @@ client.on("message", msg => {
         hosting = true;
         host = msg.author;
         msg.channel.send(`Hosting has started! The host is ${host.username}.`);
-
+        return;
     } else if (msg.content === "!host" && hosting) {
         msg.reply("Hosting has already started. The host can use `!cancel` to cancel.");
+        return;
     }
 
     // Cancel hosting command
     if (msg.content === "!cancel" && hosting && JSON.stringify(msg.author) === JSON.stringify(host)) {
         resetSanta();
         msg.channel.send("Hosting has been cancelled.");
+        return;
     } else if (msg.content === "!cancel" && !hosting) {
         msg.reply("There is no Secret Santa right now.");
+        return;
     } else if (msg.content === '!cancel' && JSON.stringify(msg.author) !== JSON.stringify(host)) {
         msg.reply(`you are not the host of this Secret Santa! Please ask ${host.username} to cancel.`);
+        return;
     }
 
     // Reset command
     if (msg.content === "!reset" && start && JSON.stringify(msg.author) === JSON.stringify(host)) {
         resetSanta();
         msg.channel.send("Hosting has been cancelled.");
+        return;
     } else if (msg.content === "!reset" && !start) {
         msg.reply("Secret Santa hasn't started yet.");
+        return;
     } else if (msg.content === '!reset' && JSON.stringify(msg.author) !== JSON.stringify(host)) {
         msg.reply(`you are not the host of this Secret Santa! Please ask ${host.username} to reset.`);
+        return;
     }
 
     // Start command
     if (msg.content === "!start" && hosting && JSON.stringify(msg.author) !== JSON.stringify(host)) {
         msg.reply(`you are not the host of this Secret Santa! Please ask ${host.username} to start.`);
-    }
-    else if (msg.content.includes("!start") && hosting && participants.length >= 3) {
+    } else if (msg.content.includes("!start") && hosting && participants.length >= 3) {
         dueDate = new Date(msg.content.substr(6));
         if (isNaN(dueDate.getTime())) {
             msg.channel.send("This end date is invalid!");
@@ -220,6 +236,13 @@ const getSantas = people => {
     }
     return people;
 }
+setInterval(checkTime, 86400000);
+
+const checkTime = () => {
+    if (start && dueDate - currDate <= 0) {
+        resetSanta();
+    }
+}
 
 const resetSanta = () => {
     participants = [];
@@ -236,35 +259,8 @@ const milliToDays = () => {
     return Math.ceil((dueDate - currDate) / 86400000);
 }
 
-const findGift = () => {
-    return "https://www.amazon.com";
-}
-
-//Previous functions
-// function getQuote() {
-//     return fetch("https://zenquotes.io/api/random")
-//     .then(res => {
-//         return res.json()
-//     })
-//     .then(data =>{
-//         return data[0]["q"] + " -" + data[0]["a"]
-//     })
-// }
-
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}!`)
 });
-
-// client.on("message", msg => {
-//     if (msg.author.bot) return;
-
-//     if (msg.content ===  "$inspire"){
-//         getQuote().then(quote => msg.channel.send(quote))
-//     }
-//     if (sadWords.some(word => msg.content.includes(word))){
-//         const encouragement = encouragements[Math.floor(Math.random() * encouragements.length)];
-//         msg.reply(encouragement);
-//     }
-// })
 
 client.login(process.env.TOKEN);
