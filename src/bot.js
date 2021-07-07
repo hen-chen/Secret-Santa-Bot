@@ -24,7 +24,7 @@ client.on("message", msg => {
         "\n `!leave` Lets you leave the Secret Santa" +
         "\n `!list` Lets you see everyone in the Secret Santa" +
         "\n `!countdown` Lets you see how much time is left before Secret Santa ends" +
-        "\n `!start` Give me a date, and I'll assign everyoen their Secret Santa and set a countdown before the event ends. Entering and leaving will no longer be available. Only available to the host" +
+        "\n `!start` Give me a date, and I'll assign everyone their Secret Santa and set a countdown before the event ends. Entering and leaving will no longer be available. Only available to the host" +
         "\n `!ask` DM me a question, and I will pass it on to your gift recipient" +
         "\n `!reply` DM me something, and I will pass it on to your Secret Santa. You can answer a question they ask, or reuqest something of your own");
         return;
