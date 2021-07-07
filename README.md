@@ -1,5 +1,7 @@
 # Secret Santa Bot
 
+![Image](https://github.com/hen-chen/Secret-Santa-Bot/blob/main/Bot_pfp.png)
+
 This discord bot allows users to host their own Secret Santa gift exchange. Just add the bot to your server, and you'll have access to all the commands below! Host an event, set a countdown, and covertly DM your Secret Santa questions so you can be sure to select the perfect gift.
 
 ## Adding the bot to your Discord server
