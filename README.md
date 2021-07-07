@@ -16,8 +16,8 @@ If you are interested in modifing or privately hosting our bot, feel free to do 
 
 ### Setup on heroku
 
-1. Create a free heroku account: [here](https://signup.heroku.com)
-1. Download the heroku CLI and follow the instructions to get started: [here](https://devcenter.heroku.com/articles/heroku-cli#download-and-install)
+1. [Create a free heroku account](https://signup.heroku.com)
+1. [Download the heroku CLI and follow the instructions to get started](https://devcenter.heroku.com/articles/heroku-cli#download-and-install)
 1. Clone the Secret Santa repository from [here](https://github.com/hen-chen/Secret-Santa-Bot.git)
     + `git clone https://github.com/hen-chen/Secret-Santa-Bot.git`
     + `cd Secret-Santa-Bot`
