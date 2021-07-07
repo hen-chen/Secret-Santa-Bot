@@ -25,16 +25,16 @@ If you are interested in modifing or privately hosting our bot, feel free to do 
 
 ## List of commands
 
-* !help: List all commands.
-* !host: Allows participants to enter and leave. There can only be one host at a time.
-* !cancel: Resets the participants list. Only available to the host.
-* !enter: Enters you into the Secret Santa.
-* !leave: Lets you leave the Secret Santa.
-* !list: Lets you see everyone in the Secret Santa.
-* !countdown: Lets you see how much time is left before Secret Santa ends.
-* !start: Give the bot a date, and it will assign everyone their Secret Santa and set a countdown before the event ends. Entering and leaving will no longer be available. Only available to the host.
-* !ask: DM the bot a question, and it will pass it on to your gift recipient.
-* !reply: DM the bot something, and it will pass it on to your Secret Santa. You can answer a question they ask, or reuqest something of your own.
+* `!help`: List all commands.
+* `!host`: Allows participants to enter and leave. There can only be one host at a time.
+* `!cancel`: Resets the participants list. Only available to the host.
+* `!enter`: Enters you into the Secret Santa.
+* `!leave`: Lets you leave the Secret Santa.
+* `!list`: Lets you see everyone in the Secret Santa.
+* `!countdown`: Lets you see how much time is left before Secret Santa ends.
+* `!start`: Give the bot a date, and it will assign everyone their Secret Santa and set a countdown before the event ends. Entering and leaving will no longer be available. Only available to the host.
+* `!ask`: DM the bot a question, and it will pass it on to your gift recipient.
+* `!reply`: DM the bot something, and it will pass it on to your Secret Santa. You can answer a question they ask, or reuqest something of your own.
 
 ## Authors
 
