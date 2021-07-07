@@ -79,7 +79,7 @@ client.on("message", msg => {
 
     // Countdown
     if (start && msg.content === "!countdown") {
-        msg.channel.send(milliToDays() + " days remaining!");
+        msg.channel.send(milliToDays() + " day(s) remaining!");
     } else if (msg.content === "!countdown" && !start) {
         msg.channel.send("Secret Santa has not started yet.");
     }
@@ -99,6 +99,9 @@ client.on("message", msg => {
         return;
     } else if (msg.content === "!host" && hosting) {
         msg.reply("Hosting has already started. The host can use `!cancel` to cancel.");
+        return;
+    } else if (msg.content === "!host" && start) {
+        msg.reply("Secret Santa has already begun! Please wait for the event to end or ask the host to reset.")
         return;
     }
 
@@ -168,9 +171,9 @@ client.on("message", msg => {
         start = true;
         hosting = false;
         msg.channel.send("Secret Santa has begun!");
-    } else if (msg.content === "!start" && !hosting) {
+    } else if (msg.content.includes("!start") && !hosting) {
         msg.reply("you need to host before you can start. Try `!host`.");
-    } else if (msg.content === '!start' && participants.length < 3) {
+    } else if (msg.content.includes('!start') && participants.length < 3) {
         msg.channel.send('Not enough participants. Need at least 3.');
     }
 })
@@ -208,14 +211,6 @@ client.on("message", msg => {
     } else if (msg.content.includes('!reply') && !givingDict.hasOwnProperty(msg.author)) {
         msg.author.send('Either you are not in the Secret Santa or the event has not yet begun. Ask your host for more details.');
     }
-
-    // Find a gift
-    if (msg.content.includes("!gift") && givingDict.hasOwnProperty(msg.author)) {
-        let message = findGift();
-        msg.author.send(message);
-    } else if (msg.content.includes('!gift') && !givingDict.hasOwnProperty(msg.author)) {
-        msg.author.send('Either you are not in the Secret Santa or the event has not yet begun. Ask your host for more details.');
-    }
 })
 
 
@@ -236,13 +231,15 @@ const getSantas = people => {
     }
     return people;
 }
-setInterval(checkTime, 86400000);
 
 const checkTime = () => {
     if (start && dueDate - currDate <= 0) {
         resetSanta();
     }
 }
+
+// Resets Secret Santa Event
+setInterval(checkTime, 86400000);
 
 const resetSanta = () => {
     participants = [];
@@ -254,6 +251,7 @@ const resetSanta = () => {
     start = false;
 }
 
+// Finds number of days remaining
 const milliToDays = () => {
     let currDate = new Date();
     return Math.ceil((dueDate - currDate) / 86400000);
